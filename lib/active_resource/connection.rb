@@ -89,7 +89,14 @@ module ActiveResource
     # Executes a GET request.
     # Used to get (find) resources.
     def get(path, headers = {})
-      with_auth { request(:get, path, build_request_headers(headers, :get, self.site.merge(path))) }
+      with_auth do
+        req = Net::HTTP::Get.new(path)
+        build_request_headers(headers, :get, self.site.merge(path)).each do |header, header_value|
+          req[header] = header_value
+        end
+
+        perform_request(req)
+      end
     end
 
     # Executes a DELETE request (see HTTP protocol documentation if unfamiliar).
