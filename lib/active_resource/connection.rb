@@ -152,12 +152,12 @@ module ActiveResource
     private
       # Performs a request to the remote service.
       def perform_request(req, headers)
-        build_request_headers(headers, req.method.to_sym, self.site.merge(req.path)).each do |header, header_value|
+        build_request_headers(headers, req.method.downcase.to_sym, self.site.merge(req.path)).each do |header, header_value|
           req[header] = header_value
         end
 
         result = ActiveSupport::Notifications.instrument("request.active_resource") do |payload|
-          payload[:method] = req.method.to_sym
+          payload[:method] = req.method.downcase.to_sym
           payload[:request_uri] = "#{site.scheme}://#{site.host}:#{site.port}#{req.path}"
           payload[:request] = req
           payload[:result] = http.request(req)
