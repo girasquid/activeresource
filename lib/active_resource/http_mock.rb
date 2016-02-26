@@ -275,6 +275,14 @@ module ActiveResource
     def inspect_responses #:nodoc:
       self.class.responses.map { |r| r[0].to_s }.inspect
     end
+
+    def request(req)
+      if %w(post patch put).include?(req.method.downcase)
+        send(req.method.downcase.to_sym, req.path, req.body, req.to_hash)
+      else
+        send(req.method.downcase.to_sym, req.path, req.to_hash)
+      end
+    end
   end
 
   class Request
