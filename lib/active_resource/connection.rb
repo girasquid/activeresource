@@ -95,7 +95,14 @@ module ActiveResource
     # Executes a DELETE request (see HTTP protocol documentation if unfamiliar).
     # Used to delete resources.
     def delete(path, headers = {})
-      with_auth { request(:delete, path, build_request_headers(headers, :delete, self.site.merge(path))) }
+      with_auth do
+        req = Net::HTTP::Delete.new(path)
+        build_request_headers(headers, :delete, self.site.merge(path)).each do |header, header_value|
+          req[header] = header_value
+        end
+
+        perform_request(req)
+      end
     end
 
     # Executes a PATCH request (see HTTP protocol documentation if unfamiliar).
