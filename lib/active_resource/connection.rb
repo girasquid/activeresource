@@ -91,11 +91,8 @@ module ActiveResource
     def get(path, headers = {})
       with_auth do
         req = Net::HTTP::Get.new(path)
-        build_request_headers(headers, :get, self.site.merge(path)).each do |header, header_value|
-          req[header] = header_value
-        end
 
-        perform_request(req)
+        perform_request(req, headers)
       end
     end
 
@@ -104,11 +101,8 @@ module ActiveResource
     def delete(path, headers = {})
       with_auth do
         req = Net::HTTP::Delete.new(path)
-        build_request_headers(headers, :delete, self.site.merge(path)).each do |header, header_value|
-          req[header] = header_value
-        end
 
-        perform_request(req)
+        perform_request(req, headers)
       end
     end
 
@@ -118,11 +112,8 @@ module ActiveResource
       with_auth do
         req = Net::HTTP::Patch.new(path)
         req.body = body.to_s
-        build_request_headers(headers, :patch, self.site.merge(path)).each do |header, header_value|
-          req[header] = header_value
-        end
 
-        perform_request(req)
+        perform_request(req, headers)
       end
     end
 
@@ -132,11 +123,8 @@ module ActiveResource
       with_auth do
         req = Net::HTTP::Put.new(path)
         req.body = body.to_s
-        build_request_headers(headers, :put, self.site.merge(path)).each do |header, header_value|
-          req[header] = header_value
-        end
 
-        perform_request(req)
+        perform_request(req, headers)
       end
     end
 
@@ -146,11 +134,8 @@ module ActiveResource
       with_auth do
         req = Net::HTTP::Post.new(path)
         req.body = body.to_s
-        build_request_headers(headers, :post, self.site.merge(path)).each do |header, header_value|
-          req[header] = header_value
-        end
 
-        perform_request(req)
+        perform_request(req, headers)
       end
     end
 
@@ -159,17 +144,18 @@ module ActiveResource
     def head(path, headers = {})
       with_auth do
         req = Net::HTTP::Head.new(path)
-        build_request_headers(headers, :head, self.site.merge(path)).each do |header, header_value|
-          req[header] = header_value
-        end
 
-        perform_request(req)
+        perform_request(req, headers)
       end
     end
 
     private
       # Performs a request to the remote service.
-      def perform_request(req)
+      def perform_request(req, headers)
+        build_request_headers(headers, req.method.to_sym, self.site.merge(req.path)).each do |header, header_value|
+          req[header] = header_value
+        end
+
         result = ActiveSupport::Notifications.instrument("request.active_resource") do |payload|
           payload[:method] = req.method.to_sym
           payload[:request_uri] = "#{site.scheme}://#{site.host}:#{site.port}#{req.path}"
