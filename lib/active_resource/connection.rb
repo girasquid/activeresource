@@ -127,7 +127,14 @@ module ActiveResource
     # Executes a HEAD request.
     # Used to obtain meta-information about resources, such as whether they exist and their size (via response headers).
     def head(path, headers = {})
-      with_auth { request(:head, path, build_request_headers(headers, :head, self.site.merge(path))) }
+      with_auth do
+        req = Net::HTTP::Head.new(path)
+        build_request_headers(headers, :head, self.site.merge(path)).each do |header, header_value|
+          req[header] = header_value
+        end
+
+        perform_request(req)
+      end
     end
 
     private
