@@ -107,7 +107,15 @@ module ActiveResource
     # Executes a PUT request (see HTTP protocol documentation if unfamiliar).
     # Used to update resources.
     def put(path, body = '', headers = {})
-      with_auth { request(:put, path, body.to_s, build_request_headers(headers, :put, self.site.merge(path))) }
+      with_auth do
+        req = Net::HTTP::Put.new(path)
+        req.body = body.to_s
+        build_request_headers(headers, :put, self.site.merge(path)).each do |header, header_value|
+          req[header] = header_value
+        end
+
+        perform_request(req)
+      end
     end
 
     # Executes a POST request.
