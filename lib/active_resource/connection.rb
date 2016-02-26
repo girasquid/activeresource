@@ -113,7 +113,15 @@ module ActiveResource
     # Executes a POST request.
     # Used to create new resources.
     def post(path, body = '', headers = {})
-      with_auth { request(:post, path, body.to_s, build_request_headers(headers, :post, self.site.merge(path))) }
+      with_auth do
+        req = Net::HTTP::Post.new(path)
+        req.body = body.to_s
+        build_request_headers(headers, :post, self.site.merge(path)).each do |header, header_value|
+          req[header] = header_value
+        end
+
+        perform_request(req)
+      end
     end
 
     # Executes a HEAD request.
@@ -129,6 +137,21 @@ module ActiveResource
           payload[:method]      = method
           payload[:request_uri] = "#{site.scheme}://#{site.host}:#{site.port}#{path}"
           payload[:result]      = http.send(method, path, *arguments)
+        end
+        handle_response(result)
+      rescue Timeout::Error => e
+        raise TimeoutError.new(e.message)
+      rescue OpenSSL::SSL::SSLError => e
+        raise SSLError.new(e.message)
+      end
+
+      # Performs a request to the remote service.
+      def perform_request(req)
+        result = ActiveSupport::Notifications.instrument("request.active_resource") do |payload|
+          payload[:method] = req.method.to_sym
+          payload[:request_uri] = "#{site.scheme}://#{site.host}:#{site.port}#{req.path}"
+          payload[:request] = req
+          payload[:result] = http.request(req)
         end
         handle_response(result)
       rescue Timeout::Error => e
@@ -269,7 +292,7 @@ module ActiveResource
       end
 
       def auth_attributes_for(uri, request_digest, params)
-        auth_attrs = 
+        auth_attrs =
           [
             %Q(username="#{@user}"),
             %Q(realm="#{params['realm']}"),
