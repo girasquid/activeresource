@@ -386,30 +386,174 @@ module ActiveResource
 
     end
 
-    # body?       methods
-    { true  => %w(post patch put),
-      false => %w(get delete head) }.each do |has_body, methods|
-      methods.each do |method|
-        # def post(path, body, headers)
-        #   request = ActiveResource::Request.new(:post, path, body, headers)
-        #   self.class.requests << request
-        #   if response = self.class.responses.assoc(request)
-        #     response[1]
-        #   else
-        #     raise InvalidRequestError.new("Could not find a response recorded for #{request.to_s} - Responses recorded are: - #{inspect_responses}")
-        #   end
-        # end
-        module_eval <<-EOE, __FILE__, __LINE__ + 1
-          def #{method}(path, #{'body, ' if has_body}headers)
-            request = ActiveResource::Request.new(:#{method}, path, #{has_body ? 'body, ' : 'nil, '}headers)
-            self.class.requests << request
-            if response = self.class.responses.assoc(request)
-              response[1]
-            else
-              raise InvalidRequestError.new("Could not find a response recorded for \#{request.to_s} - Responses recorded are: \#{inspect_responses}")
-            end
-          end
-        EOE
+    # # body?       methods
+    # { true  => %w(post patch put),
+    #   false => %w(get delete head) }.each do |has_body, methods|
+    #   methods.each do |method|
+    #     # def post(path, body, headers)
+    #     #   request = ActiveResource::Request.new(:post, path, body, headers)
+    #     #   self.class.requests << request
+    #     #   if response = self.class.responses.assoc(request)
+    #     #     response[1]
+    #     #   else
+    #     #     raise InvalidRequestError.new("Could not find a response recorded for #{request.to_s} - Responses recorded are: - #{inspect_responses}")
+    #     #   end
+    #     # end
+    #     module_eval <<-EOE, __FILE__, __LINE__ + 1
+    #       def #{method}(path, #{'body, ' if has_body}headers)
+    #         request = ActiveResource::Request.new(:#{method}, path, #{has_body ? 'body, ' : 'nil, '}headers)
+    #         self.class.requests << request
+    #         if response = self.class.responses.assoc(request)
+    #           response[1]
+    #         else
+    #           raise InvalidRequestError.new("Could not find a response recorded for \#{request.to_s} - Responses recorded are: \#{inspect_responses}")
+    #         end
+    #       end
+    #     EOE
+    #   end
+    # end
+
+    def post(path, body, request_headers)
+      mime_type_header_value = if path.include?('.json')
+        'application/json'
+      elsif path.include?('.xml')
+        'application/xml'
+      else
+        'application/json'
+      end
+      format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:post]
+      headers = {
+        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+        "User-Agent" => "Ruby",
+        format_header => mime_type_header_value
+      }.merge(request_headers)
+
+      request = ActiveResource::Request.new(:post, path, body, headers)
+      self.class.requests << request
+      if response = self.class.responses.assoc(request)
+        response[1]
+      else
+        raise InvalidRequestError.new("Could not find a response recorded for #{request.to_s} - Responses recorded are #{inspect_responses}")
+      end
+    end
+
+    def patch(path, body, request_headers)
+      mime_type_header_value = if path.include?('.json')
+        'application/json'
+      elsif path.include?('.xml')
+        'application/xml'
+      else
+        'application/json'
+      end
+      format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:patch]
+      headers = {
+        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+        "User-Agent" => "Ruby",
+        format_header => mime_type_header_value
+      }.merge(request_headers)
+
+      request = ActiveResource::Request.new(:patch, path, body, headers)
+      self.class.requests << request
+      if response = self.class.responses.assoc(request)
+        response[1]
+      else
+        raise InvalidRequestError.new("Could not find a response recorded for #{request.to_s} - Responses recorded are #{inspect_responses}")
+      end
+    end
+
+    def put(path, body, request_headers)
+      mime_type_header_value = if path.include?('.json')
+        'application/json'
+      elsif path.include?('.xml')
+        'application/xml'
+      else
+        'application/json'
+      end
+      format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:put]
+      headers = {
+        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+        "User-Agent" => "Ruby",
+        format_header => mime_type_header_value
+      }.merge(request_headers)
+
+      request = ActiveResource::Request.new(:put, path, body, headers)
+      self.class.requests << request
+      if response = self.class.responses.assoc(request)
+        response[1]
+      else
+        raise InvalidRequestError.new("Could not find a response recorded for #{request.to_s} - Responses recorded are #{inspect_responses}")
+      end
+    end
+
+    def get(path, request_headers)
+      mime_type_header_value = if path.include?('.json')
+        'application/json'
+      elsif path.include?('.xml')
+        'application/xml'
+      else
+        'application/json'
+      end
+      format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:get]
+      headers = {
+        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+        "User-Agent" => "Ruby",
+        format_header => mime_type_header_value
+      }.merge(request_headers)
+
+      request = ActiveResource::Request.new(:get, path, nil, headers)
+      self.class.requests << request
+      if response = self.class.responses.assoc(request)
+        response[1]
+      else
+        raise InvalidRequestError.new("Could not find a response recorded for #{request.to_s} - Responses recorded are #{inspect_responses}")
+      end
+    end
+
+    def delete(path, request_headers)
+      mime_type_header_value = if path.include?('.json')
+        'application/json'
+      elsif path.include?('.xml')
+        'application/xml'
+      else
+        'application/json'
+      end
+      format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:delete]
+      headers = {
+        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+        "User-Agent" => "Ruby",
+        format_header => mime_type_header_value
+      }.merge(request_headers)
+
+      request = ActiveResource::Request.new(:delete, path, nil, headers)
+      self.class.requests << request
+      if response = self.class.responses.assoc(request)
+        response[1]
+      else
+        raise InvalidRequestError.new("Could not find a response recorded for #{request.to_s} - Responses recorded are #{inspect_responses}")
+      end
+    end
+
+    def head(path, request_headers)
+      mime_type_header_value = if path.include?('.json')
+        'application/json'
+      elsif path.include?('.xml')
+        'application/xml'
+      else
+        'application/json'
+      end
+      format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:head]
+      headers = {
+        "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+        "User-Agent" => "Ruby",
+        format_header => mime_type_header_value
+      }.merge(request_headers)
+
+      request = ActiveResource::Request.new(:head, path, nil, headers)
+      self.class.requests << request
+      if response = self.class.responses.assoc(request)
+        response[1]
+      else
+        raise InvalidRequestError.new("Could not find a response recorded for #{request.to_s} - Responses recorded are #{inspect_responses}")
       end
     end
 
