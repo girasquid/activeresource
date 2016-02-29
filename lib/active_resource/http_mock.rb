@@ -305,10 +305,20 @@ module ActiveResource
     def headers_match?(req)
       # Ignore format header on equality if it's not defined
       format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[method]
-      if headers[format_header].present? || req.headers[format_header].blank?
-        headers == req.headers
+      automatic_net_http_headers = {
+        "accept-encoding"=>["gzip;q=1.0,deflate;q=0.6,identity;q=0.3"],
+        "accept"=>["application/json"],
+        "user-agent"=>["Ruby"]
+      }
+      headers_to_match = req.headers
+      automatic_net_http_headers.each do |header, value|
+        headers_to_match.delete(header) if headers_to_match[header] == value
+      end
+      if headers[format_header].present? || headers_to_match[format_header].blank?
+        result = headers == headers_to_match
+        headers == headers_to_match
       else
-        headers.dup.merge(format_header => req.headers[format_header]) == req.headers
+        headers.dup.merge(format_header => headers_to_match[format_header]) == headers_to_match
       end
     end
   end
