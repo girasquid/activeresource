@@ -798,14 +798,14 @@ class BaseTest < ActiveSupport::TestCase
   end
 
   def test_build_with_custom_header
-    Person.headers['key'] = 'value'
+    Person.headers['Key'] = 'value'
     ActiveResource::HttpMock.respond_to do |mock|
       mock.get "/people/new.json", {}, Person.new.to_json
-      mock.get "/people/new.json", { 'key' => 'value' }, Person.new.to_json, 404
+      mock.get "/people/new.json", { 'Key' => 'value' }, Person.new.to_json, 404
     end
     assert_raise(ActiveResource::ResourceNotFound) { Person.build }
   ensure
-    Person.headers.delete('key')
+    Person.headers.delete('Key')
   end
 
   def test_build_without_attributes_for_prefix_call
@@ -1123,14 +1123,14 @@ class BaseTest < ActiveSupport::TestCase
   end
 
   def test_delete_with_custom_header
-    Person.headers['key'] = 'value'
+    Person.headers['Key'] = 'value'
     ActiveResource::HttpMock.respond_to do |mock|
       mock.delete "/people/1.json", {}, nil, 200
-      mock.delete "/people/1.json", { 'key' => 'value' }, nil, 404
+      mock.delete "/people/1.json", { 'Key' => 'value' }, nil, 404
     end
     assert_raise(ActiveResource::ResourceNotFound) { Person.delete(1) }
   ensure
-    Person.headers.delete('key')
+    Person.headers.delete('Key')
   end
 
   ########################################################################
