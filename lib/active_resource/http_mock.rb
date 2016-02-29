@@ -61,7 +61,7 @@ module ActiveResource
         elsif path.include?('.xml')
           'application/xml'
         else
-          '*/*'
+          'application/json'
         end
         format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:post]
         headers = {
@@ -83,7 +83,7 @@ module ActiveResource
         elsif path.include?('.xml')
           'application/xml'
         else
-          '*/*'
+          'application/json'
         end
         format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:patch]
         headers = {
@@ -105,7 +105,7 @@ module ActiveResource
         elsif path.include?('.xml')
           'application/xml'
         else
-          '*/*'
+          'application/json'
         end
         format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:put]
         headers = {
@@ -127,7 +127,7 @@ module ActiveResource
         elsif path.include?('.xml')
           'application/xml'
         else
-          '*/*'
+          'application/json'
         end
         format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:get]
         headers = {
@@ -149,7 +149,7 @@ module ActiveResource
         elsif path.include?('.xml')
           'application/xml'
         else
-          '*/*'
+          'application/json'
         end
         format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:delete]
         headers = {
@@ -171,7 +171,7 @@ module ActiveResource
         elsif path.include?('.xml')
           'application/xml'
         else
-          '*/*'
+          'application/json'
         end
         format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:head]
         headers = {
