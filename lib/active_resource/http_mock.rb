@@ -312,7 +312,11 @@ module ActiveResource
       }
       headers_to_match = req.headers
       automatic_net_http_headers.each do |header, value|
-        headers_to_match.delete(header) if headers_to_match[header] == value
+        headers_to_match.delete(header) if headers_to_match[header] == value && header != format_header
+      end
+      if [:post, :put, :patch, :delete].include?(@method)
+        headers_to_match.delete("accept") if headers_to_match["accept"] == ["*/*"]
+        headers_to_match.delete("content-type") if headers_to_match["content-type"] == ["application/json"]
       end
       if headers[format_header].present? || headers_to_match[format_header].blank?
         result = headers == headers_to_match
