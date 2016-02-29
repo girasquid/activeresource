@@ -55,21 +55,166 @@ module ActiveResource
         @responses = responses
       end
 
-      [ :post, :patch, :put, :get, :delete, :head ].each do |method|
-        # def post(path, request_headers = {}, body = nil, status = 200, response_headers = {})
-        #   @responses[Request.new(:post, path, nil, request_headers)] = Response.new(body || "", status, response_headers)
-        # end
-        module_eval <<-EOE, __FILE__, __LINE__ + 1
-          def #{method}(path, request_headers = {}, body = nil, status = 200, response_headers = {})
-            request  = Request.new(:#{method}, path, nil, request_headers)
-            response = Response.new(body || "", status, response_headers)
+      def post(path, request_headers = {}, body = nil, status = 200, response_headers = {})
+        mime_type_header_value = if path.include?('.json')
+          'application/json'
+        elsif path.include?('.xml')
+          'application/xml'
+        else
+          '*/*'
+        end
+        format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:post]
+        headers = {
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "User-Agent" => "Ruby",
+          format_header => mime_type_header_value
+        }.merge(request_headers)
+        request = Request.new(:post, path, nil, headers)
+        response = Response.new(body || "", status, response_headers)
 
-            delete_duplicate_responses(request)
+        delete_duplicate_responses(request)
 
-            @responses << [request, response]
-          end
-        EOE
+        @responses << [request, response]
       end
+
+      def patch(path, request_headers = {}, body = nil, status = 200, response_headers = {})
+        mime_type_header_value = if path.include?('.json')
+          'application/json'
+        elsif path.include?('.xml')
+          'application/xml'
+        else
+          '*/*'
+        end
+        format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:patch]
+        headers = {
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "User-Agent" => "Ruby",
+          format_header => mime_type_header_value
+        }.merge(request_headers)
+        request = Request.new(:patch, path, nil, headers)
+        response = Response.new(body || "", status, response_headers)
+
+        delete_duplicate_responses(request)
+
+        @responses << [request, response]
+      end
+
+      def put(path, request_headers = {}, body = nil, status = 200, response_headers = {})
+        mime_type_header_value = if path.include?('.json')
+          'application/json'
+        elsif path.include?('.xml')
+          'application/xml'
+        else
+          '*/*'
+        end
+        format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:put]
+        headers = {
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "User-Agent" => "Ruby",
+          format_header => mime_type_header_value
+        }.merge(request_headers)
+        request = Request.new(:put, path, nil, headers)
+        response = Response.new(body || "", status, response_headers)
+
+        delete_duplicate_responses(request)
+
+        @responses << [request, response]
+      end
+
+      def get(path, request_headers = {}, body = nil, status = 200, response_headers = {})
+        mime_type_header_value = if path.include?('.json')
+          'application/json'
+        elsif path.include?('.xml')
+          'application/xml'
+        else
+          '*/*'
+        end
+        format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:get]
+        headers = {
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "User-Agent" => "Ruby",
+          format_header => mime_type_header_value
+        }.merge(request_headers)
+        request = Request.new(:get, path, nil, headers)
+        response = Response.new(body || "", status, response_headers)
+
+        delete_duplicate_responses(request)
+
+        @responses << [request, response]
+      end
+
+      def delete(path, request_headers = {}, body = nil, status = 200, response_headers = {})
+        mime_type_header_value = if path.include?('.json')
+          'application/json'
+        elsif path.include?('.xml')
+          'application/xml'
+        else
+          '*/*'
+        end
+        format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:delete]
+        headers = {
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "User-Agent" => "Ruby",
+          format_header => mime_type_header_value
+        }.merge(request_headers)
+        request = Request.new(:delete, path, nil, headers)
+        response = Response.new(body || "", status, response_headers)
+
+        delete_duplicate_responses(request)
+
+        @responses << [request, response]
+      end
+
+      def head(path, request_headers = {}, body = nil, status = 200, response_headers = {})
+        mime_type_header_value = if path.include?('.json')
+          'application/json'
+        elsif path.include?('.xml')
+          'application/xml'
+        else
+          '*/*'
+        end
+        format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[:head]
+        headers = {
+          "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+          "User-Agent" => "Ruby",
+          format_header => mime_type_header_value
+        }.merge(request_headers)
+        request = Request.new(:head, path, nil, headers)
+        response = Response.new(body || "", status, response_headers)
+
+        delete_duplicate_responses(request)
+
+        @responses << [request, response]
+      end
+
+      # [ :post, :patch, :put, :get, :delete, :head ].each do |method|
+      #   # def post(path, request_headers = {}, body = nil, status = 200, response_headers = {})
+      #   #   @responses[Request.new(:post, path, nil, request_headers)] = Response.new(body || "", status, response_headers)
+      #   # end
+      #   module_eval <<-EOE, __FILE__, __LINE__ + 1
+      #     def #{method}(path, request_headers = {}, body = nil, status = 200, response_headers = {})
+      #       mime_type_header_value = if path.include?('.json')
+      #         'application/json'
+      #       elsif path.include?('.xml')
+      #         'application/xml'
+      #       else
+      #         '*/*'
+      #       end
+      #       format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[method]
+      #       headers = {
+      #         "Accept-Encoding" => "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+      #         "User-Agent" => "Ruby",
+      #         format_header => mime_type_header_value,
+      #       }.merge(request_headers)
+      #       request  = Request.new(:#{method}, path, nil, headers)
+      #       response = Response.new(body || "", status, response_headers)
+
+      #       delete_duplicate_responses(request)
+
+      #       @responses << [request, response]
+      #     end
+      #   EOE
+      # end
 
     private
 
@@ -277,10 +422,14 @@ module ActiveResource
     end
 
     def request(req)
+      headers = {}
+      req.each_capitalized do |header, value|
+        headers[header] = value
+      end
       if %w(post patch put).include?(req.method.downcase)
-        send(req.method.downcase.to_sym, req.path, req.body, req.to_hash)
+        send(req.method.downcase.to_sym, req.path, req.body, headers)
       else
-        send(req.method.downcase.to_sym, req.path, req.to_hash)
+        send(req.method.downcase.to_sym, req.path, headers)
       end
     end
   end
@@ -289,7 +438,15 @@ module ActiveResource
     attr_accessor :path, :method, :body, :headers
 
     def initialize(method, path, body = nil, headers = {})
-      @method, @path, @body, @headers = method, path, body, headers
+      @method, @path, @body = method, path, body
+      format_header = ActiveResource::Connection::HTTP_FORMAT_HEADER_NAMES[method]
+      unless format_header == "Accept"
+        # Net::HTTP does a ||= on the "Accept" header for you..
+        @headers = headers.except("Accept")
+      else
+        @headers = headers
+      end
+
     end
 
     def ==(req)
