@@ -216,7 +216,13 @@ class ConnectionTest < ActiveSupport::TestCase
     @http = mock('new Net::HTTP')
     @conn.expects(:http).returns(@http)
     path = '/people/1.xml'
-    @http.expects(:request).with(path, { 'Accept' => 'application/xhtml+xml' }).returns(ActiveResource::Response.new(@matz, 200, { 'Content-Type' => 'text/xhtml' }))
+    # Net::HTTP provided defaults
+    Net::HTTP::Get.any_instance.expects(:[]=).with("Accept", "*/*")
+    Net::HTTP::Get.any_instance.expects(:[]=).with("User-Agent", "Ruby")
+    Net::HTTP::Get.any_instance.expects(:[]=).with("Host", nil)
+
+    Net::HTTP::Get.any_instance.expects(:[]=).with("Accept", "application/xhtml+xml")
+    @http.expects(:request).with(kind_of(Net::HTTP::Get)).returns(ActiveResource::Response.new(@matz, 200, { 'Content-Type' => 'text/xhtml' }))
     assert_nothing_raised(Mocha::ExpectationError) { @conn.get(path, { 'Accept' => 'application/xhtml+xml' }) }
   end
 
